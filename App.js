@@ -1,97 +1,129 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
-class App extends Component {
+class App extends Component{
 
-  constructor(props) {
+  constructor(props){
     super(props);
     this.state = {
-      textoFrase: '',
-      img: require('./src/biscoito.png'),
+      numero: 0,
+      botao: 'VAI',
+      ultimo: null
     };
 
-    this.quebraBiscoito = this.quebraBiscoito.bind(this);
+    this.timer = null;
 
-    this.frases = [
-      'Siga os bons e aprenda com eles.',
-      'O bom-senso vale mais do que muito conhecimento.',
-      'O riso é a menor distância entre duas pessoas.',
-      'Deixe de lado as preocupações e seja feliz.',
-      'Realize o óbvio, pense no improvável e conquiste o impossível.',
-      'Acredite em milagres, mas não dependa deles.',
-      'A maior barreira para o sucesso é o medo do fracasso.'
-    ];
+    this.vai = this.vai.bind(this);
+    this.limpar = this.limpar.bind(this);
+  }
+
+  vai(){
+
+    if(this.timer != null){
+
+      clearInterval(this.timer);
+      this.timer = null;
+
+      this.setState({botao: 'VAI'});
+    }else{
+
+
+      this.timer = setInterval( ()=> {
+        this.setState({numero: this.state.numero + 0.1})
+      }, 100);
+
+      this.setState({botao: 'PARAR'});
+    }
 
   }
 
-  quebraBiscoito() {
-    let numeroAleatorio = Math.floor(Math.random() * this.frases.length);
-
+  limpar(){
+    if(this.timer != null){
+      clearInterval(this.timer);
+      this.timer = null;
+    }
     this.setState({
-      textoFrase: ' "' + this.frases[numeroAleatorio] + '" ',
-      img: require('./src/biscoitoAberto.png')
-    });
-
+      ultimo: this.state.numero,
+      numero: 0,
+      botao: 'VAI'
+    })
   }
 
+  render(){
+    return(
+      <View style={styles.container}>  
 
-  render() {
-    return (
-      <View style={styles.container} >
+      <Image
+      source={require('./src/cronometro.png')}
+      style={styles.cronometro}
+      />
 
-        <Image
-          source={this.state.img}
-          style={styles.img}
-        />
+      <Text style={styles.timer}> {this.state.numero.toFixed(1)} </Text>
 
-        <Text style={styles.textoFrase}>{this.state.textoFrase}</Text>
+      <View style={styles.btnArea}>
 
-        <TouchableOpacity style={styles.botao} onPress={this.quebraBiscoito}>
-          <View style={styles.btnArea}>
-            <Text style={styles.btnTexto}>Quebrar Biscoito</Text>
-          </View>
+        <TouchableOpacity style={styles.btn} onPress={this.vai}>
+          <Text style={styles.btnTexto}> {this.state.botao} </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.btn} onPress={this.limpar}>
+          <Text style={styles.btnTexto}>LIMPAR</Text>
         </TouchableOpacity>
 
       </View>
+
+      <View style={styles.areaUltima}>
+          <Text style={styles.textoCorrida}>
+            {this.state.ultimo > 0 ? 'Ultimo tempo: ' + this.state.ultimo.toFixed(2) + 's' : ''}
+          </Text>
+      </View>
+
+
+      </View>    
     );
   }
 
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  img: {
-    width: 250,
-    height: 250,
-  },
-  textoFrase: {
-    fontSize: 20,
-    color: '#dd7b22',
-    margin: 30,
-    fontStyle: 'italic',
-    textAlign: 'center'
-  },
-  botao: {
-    width: 230,
-    height: 50,
-    borderWidth: 2,
-    borderColor: '#dd7b22',
-    borderRadius: 25
-  },
-  btnArea: {
-    flex: 1,
-    flexDirection: 'row',
+  container:{
+    flex:1,
+    alignItems:'center',
     justifyContent: 'center',
-    alignItems: 'center'
+    backgroundColor: '#00aeef'
   },
-  btnTexto: {
-    fontSize: 18,
+  timer:{
+    marginTop:-160,
+    color: '#FFF',
+    fontSize: 65,
+    fontWeight: 'bold'
+  },
+  btnArea:{
+    flexDirection: 'row',
+    marginTop: 70,
+    height: 40
+  },
+  btn:{
+    flex:1,
+    justifyContent:'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    height: 40,
+    margin: 17,
+    borderRadius: 9
+  },
+  btnTexto:{
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#dd7b22'
+    color: '#00aeef'
+  },
+  areaUltima:{
+    marginTop: 40,
+  },
+  textoCorrida:{
+    fontSize:25,
+    fontStyle:'italic',
+    color: '#FFF'
   }
 });
 
